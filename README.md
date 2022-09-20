@@ -1,0 +1,1 @@
+# Haskell Abstraction Patterns
