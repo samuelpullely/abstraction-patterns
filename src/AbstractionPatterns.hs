@@ -28,3 +28,11 @@ threeHops address0 =
                     case M.lookup address2 addressMapping of
                         Nothing -> Nothing
                         Just address3 -> Just (show address3)
+
+-- (>>=) :: IO a -> (a -> IO b) -> IO b
+
+bindMaybe :: Maybe a -> (a -> Maybe b) -> Maybe b
+bindMaybe computation continuation = 
+    case computation of 
+        Nothing -> Nothing
+        Just result -> continuation result
