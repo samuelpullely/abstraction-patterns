@@ -32,10 +32,10 @@ threeHopsOriginal address0 =
 
 threeHops :: Address -> Maybe String
 threeHops address0 = 
-    M.lookup address0 addressMapping `bindMaybe` \ address1 -> 
-    M.lookup address1 addressMapping `bindMaybe` \ address2 -> 
-    M.lookup address2 addressMapping `bindMaybe` \ address3 -> 
-    returnMaybe (show address3)
+    M.lookup address0 addressMapping >>= \ address1 -> 
+    M.lookup address1 addressMapping >>= \ address2 -> 
+    M.lookup address2 addressMapping >>= \ address3 -> 
+    return (show address3)
 
 -- (>>=) :: IO a -> (a -> IO b) -> IO b
 -- return :: a -> IO a
@@ -84,12 +84,12 @@ labelTree'Orig (Node l x r) =
     )
 
 labelTree' :: Tree a -> WithCounter (Tree (Int, a))
-labelTree' Leaf = returnWithCounter Leaf
+labelTree' Leaf = return Leaf
 labelTree' (Node l x r) = 
-    labelTree' l `bindWithCounter` \ l' -> 
-    tick `bindWithCounter` \ labelForX ->
-    labelTree' r `bindWithCounter` \ r' ->
-    returnWithCounter (Node l' (labelForX, x) r')
+    labelTree' l >>= \ l' -> 
+    tick         >>= \ labelForX ->
+    labelTree' r >>= \ r' ->
+    return (Node l' (labelForX, x) r')
 
 tick :: WithCounter Int
 tick = MkWithCounter (\ current -> (current, current + 1))
