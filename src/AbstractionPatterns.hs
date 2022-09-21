@@ -61,19 +61,24 @@ buildTree x h =
                 Node subTree x subTree
 
 labelTree :: Tree a -> Tree (Int, a)
-labelTree tree = fst (labelTree' tree 1)
+labelTree tree = fst (runWithCounter (labelTree' tree) 1)
 
-type WithCounter a = Int -> (a, Int)
+newtype WithCounter a = MkWithCounter {runWithCounter :: Int -> (a, Int)}
+
+-- MkWithCounter :: (Int -> (a, Int)) -> WithCounter a
+-- runWithCounter :: WithCounter a -> (Int -> (a, Int))
 
 labelTree' :: Tree a -> WithCounter (Tree (Int, a))
-labelTree' Leaf currentLabel = (Leaf, currentLabel)
-labelTree' (Node l x r) currentLabel = 
-    case labelTree' l currentLabel of
-        (l', currentLabel') ->
-            let
-                labelForX = currentLabel'
-                nextLabel = currentLabel' + 1
-            in
-                case labelTree' r nextLabel of
-                    (r', currentLabel'') -> 
-                        (Node l' (labelForX, x) r', currentLabel'')
+labelTree' Leaf = MkWithCounter (\ currentLabel -> (Leaf, currentLabel))
+labelTree' (Node l x r) = 
+    MkWithCounter (\ currentLabel ->
+        case runWithCounter (labelTree' l) currentLabel of
+            (l', currentLabel') ->
+                let
+                    labelForX = currentLabel'
+                    nextLabel = currentLabel' + 1
+                in
+                    case runWithCounter (labelTree' r) nextLabel of
+                        (r', currentLabel'') -> 
+                            (Node l' (labelForX, x) r', currentLabel'')
+    )
