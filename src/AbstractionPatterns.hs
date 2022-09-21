@@ -34,12 +34,16 @@ threeHops address0 =
     M.lookup address0 addressMapping `bindMaybe` \ address1 -> 
     M.lookup address1 addressMapping `bindMaybe` \ address2 -> 
     M.lookup address2 addressMapping `bindMaybe` \ address3 -> 
-    Just (show address3)
+    returnMaybe (show address3)
 
 -- (>>=) :: IO a -> (a -> IO b) -> IO b
+-- return :: a -> IO a
 
 bindMaybe :: Maybe a -> (a -> Maybe b) -> Maybe b
 bindMaybe computation continuation = 
     case computation of 
         Nothing -> Nothing
         Just result -> continuation result
+
+returnMaybe :: a -> Maybe a
+returnMaybe x = Just x
