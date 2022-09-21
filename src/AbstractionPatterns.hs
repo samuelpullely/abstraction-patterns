@@ -74,11 +74,12 @@ labelTree' (Node l x r) =
     MkWithCounter (\ currentLabel ->
         case runWithCounter (labelTree' l) currentLabel of
             (l', currentLabel') ->
-                let
-                    labelForX = currentLabel'
-                    nextLabel = currentLabel' + 1
-                in
-                    case runWithCounter (labelTree' r) nextLabel of
-                        (r', currentLabel'') -> 
-                            (Node l' (labelForX, x) r', currentLabel'')
+                case runWithCounter tick currentLabel' of
+                    (labelForX, nextLabel) ->
+                        case runWithCounter (labelTree' r) nextLabel of
+                            (r', currentLabel'') -> 
+                                (Node l' (labelForX, x) r', currentLabel'')
     )
+
+tick :: WithCounter Int
+tick = MkWithCounter (\ current -> (current, current + 1))
