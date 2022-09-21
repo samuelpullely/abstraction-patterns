@@ -2,6 +2,7 @@ module AbstractionPatterns where
 
 import Data.Map (Map)
 import qualified Data.Map as M
+import Prelude hiding (Monad(..))
 
 newtype Address = MkAddress Int
     deriving (Eq, Ord, Show)
@@ -47,6 +48,7 @@ bindMaybe computation continuation =
 
 returnMaybe :: a -> Maybe a
 returnMaybe x = Just x
+
 
 data Tree a = Node (Tree a) a (Tree a) | Leaf deriving Show
 
@@ -102,3 +104,16 @@ bindWithCounter computation continuation =
 returnWithCounter :: a -> WithCounter a
 returnWithCounter x =
     MkWithCounter (\ currentCounter -> (x, currentCounter))
+
+
+class Monad m where
+    return :: a -> m a
+    (>>=) :: m a -> (a -> m b) -> m b
+
+instance Monad Maybe where
+    return = returnMaybe
+    (>>=) = bindMaybe
+
+instance Monad WithCounter where
+    return = returnWithCounter
+    (>>=) = bindWithCounter
