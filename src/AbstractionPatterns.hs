@@ -59,3 +59,19 @@ buildTree x h =
                 subTree = buildTree x (h - 1)
             in 
                 Node subTree x subTree
+
+labelTree :: Tree a -> Tree (Int, a)
+labelTree tree = fst (labelTree' tree 1)
+
+labelTree' :: Tree a -> Int -> (Tree (Int, a), Int)
+labelTree' Leaf currentLabel = (Leaf, currentLabel)
+labelTree' (Node l x r) currentLabel = 
+    case labelTree' l currentLabel of
+        (l', currentLabel') ->
+            let
+                labelForX = currentLabel'
+                nextLabel = currentLabel' + 1
+            in
+                case labelTree' r nextLabel of
+                    (r', currentLabel'') -> 
+                        (Node l' (labelForX, x) r', currentLabel'')
