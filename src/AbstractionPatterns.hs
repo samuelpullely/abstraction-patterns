@@ -68,18 +68,26 @@ newtype WithCounter a = MkWithCounter {runWithCounter :: Int -> (a, Int)}
 -- MkWithCounter :: (Int -> (a, Int)) -> WithCounter a
 -- runWithCounter :: WithCounter a -> (Int -> (a, Int))
 
-labelTree' :: Tree a -> WithCounter (Tree (Int, a))
-labelTree' Leaf = MkWithCounter (\ currentLabel -> (Leaf, currentLabel))
-labelTree' (Node l x r) = 
+labelTree'Orig :: Tree a -> WithCounter (Tree (Int, a))
+labelTree'Orig Leaf = MkWithCounter (\ currentLabel -> (Leaf, currentLabel))
+labelTree'Orig (Node l x r) = 
     MkWithCounter (\ currentLabel ->
-        case runWithCounter (labelTree' l) currentLabel of
+        case runWithCounter (labelTree'Orig l) currentLabel of
             (l', currentLabel') ->
                 case runWithCounter tick currentLabel' of
                     (labelForX, nextLabel) ->
-                        case runWithCounter (labelTree' r) nextLabel of
+                        case runWithCounter (labelTree'Orig r) nextLabel of
                             (r', currentLabel'') -> 
                                 (Node l' (labelForX, x) r', currentLabel'')
     )
+
+labelTree' :: Tree a -> WithCounter (Tree (Int, a))
+labelTree' Leaf = returnWithCounter Leaf
+labelTree' (Node l x r) = 
+    labelTree' l `bindWithCounter` \ l' -> 
+    tick `bindWithCounter` \ labelForX ->
+    labelTree' r `bindWithCounter` \ r' ->
+    returnWithCounter (Node l' (labelForX, x) r')
 
 tick :: WithCounter Int
 tick = MkWithCounter (\ current -> (current, current + 1))
