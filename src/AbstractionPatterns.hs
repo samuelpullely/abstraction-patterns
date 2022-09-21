@@ -63,7 +63,9 @@ buildTree x h =
 labelTree :: Tree a -> Tree (Int, a)
 labelTree tree = fst (labelTree' tree 1)
 
-labelTree' :: Tree a -> Int -> (Tree (Int, a), Int)
+type WithCounter a = Int -> (a, Int)
+
+labelTree' :: Tree a -> WithCounter (Tree (Int, a))
 labelTree' Leaf currentLabel = (Leaf, currentLabel)
 labelTree' (Node l x r) currentLabel = 
     case labelTree' l currentLabel of
