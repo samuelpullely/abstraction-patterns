@@ -47,3 +47,15 @@ bindMaybe computation continuation =
 
 returnMaybe :: a -> Maybe a
 returnMaybe x = Just x
+
+data Tree a = Node (Tree a) a (Tree a) | Leaf deriving Show
+
+buildTree :: a -> Int -> Tree a
+buildTree x h =
+    if h <= 0
+        then Leaf
+        else
+            let
+                subTree = buildTree x (h - 1)
+            in 
+                Node subTree x subTree
