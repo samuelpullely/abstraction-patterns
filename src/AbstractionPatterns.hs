@@ -17,8 +17,8 @@ addressMapping = M.fromList
     (MkAddress 9, MkAddress 5),
     (MkAddress 16, MkAddress 9)]
 
-threeHops :: Address -> Maybe String
-threeHops address0 = 
+threeHopsOriginal :: Address -> Maybe String
+threeHopsOriginal address0 = 
     case M.lookup address0 addressMapping of
         Nothing -> Nothing
         Just address1 -> 
@@ -28,6 +28,13 @@ threeHops address0 =
                     case M.lookup address2 addressMapping of
                         Nothing -> Nothing
                         Just address3 -> Just (show address3)
+
+threeHops :: Address -> Maybe String
+threeHops address0 = 
+    M.lookup address0 addressMapping `bindMaybe` \ address1 -> 
+    M.lookup address1 addressMapping `bindMaybe` \ address2 -> 
+    M.lookup address2 addressMapping `bindMaybe` \ address3 -> 
+    Just (show address3)
 
 -- (>>=) :: IO a -> (a -> IO b) -> IO b
 
