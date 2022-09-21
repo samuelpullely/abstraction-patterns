@@ -83,3 +83,14 @@ labelTree' (Node l x r) =
 
 tick :: WithCounter Int
 tick = MkWithCounter (\ current -> (current, current + 1))
+
+bindWithCounter :: WithCounter a -> (a -> WithCounter b) -> WithCounter b
+bindWithCounter computation continuation =
+    MkWithCounter (\ currentCounter ->
+        case runWithCounter computation currentCounter of
+            (result, currentCounter') -> runWithCounter (continuation result) currentCounter'
+    )
+
+returnWithCounter :: a -> WithCounter a
+returnWithCounter x =
+    MkWithCounter (\ currentCounter -> (x, currentCounter))
