@@ -2,7 +2,7 @@ module AbstractionPatterns where
 
 import Data.Map (Map)
 import qualified Data.Map as M
-import Prelude hiding (Monad(..))
+import Prelude hiding (Monad(..), Applicative(..))
 
 newtype Address = MkAddress Int
     deriving (Eq, Ord, Show)
@@ -106,7 +106,7 @@ returnWithCounter x =
     MkWithCounter (\ currentCounter -> (x, currentCounter))
 
 
-class Monad m where
+class Applicative m => Monad m where
     return :: a -> m a
     (>>=) :: m a -> (a -> m b) -> m b
 
@@ -114,9 +114,17 @@ instance Monad Maybe where
     return = returnMaybe
     (>>=) = bindMaybe
 
+instance Applicative Maybe where
+    pure = return
+    (<*>) = ap
+
 instance Monad WithCounter where
     return = returnWithCounter
     (>>=) = bindWithCounter
+
+instance Applicative WithCounter where
+    pure = return
+    (<*>) = ap
 
 liftM :: Monad m => (a -> b) -> m a -> m b
 liftM f computation = 
@@ -151,3 +159,7 @@ liftM2' f computationa computationb =
 liftM5' :: Monad m => (a1 -> a2 -> a3 -> a4 -> a5 -> b) -> m a1 -> m a2 -> m a3 -> m a4 -> m a5 -> m b
 liftM5' f c1 c2 c3 c4 c5 =
     return f `ap` c1 `ap` c2 `ap` c3 `ap` c4 `ap` c5
+
+class Applicative f where
+    pure :: a -> f a
+    (<*>) :: f (a -> b) -> f a -> f b
