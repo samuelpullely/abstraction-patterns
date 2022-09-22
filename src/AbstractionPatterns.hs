@@ -31,6 +31,22 @@ threeHopsOriginal address0 =
                         Nothing -> Nothing
                         Just address3 -> Just (show address3)
 
+data ErrorMessage = AddressLookupFailed Address deriving Show
+
+threeHops' :: Address -> Either ErrorMessage String
+threeHops' address0 = 
+    do
+        address1 <- lookup' address0 addressMapping
+        address2 <- lookup' address1 addressMapping
+        address3 <- lookup' address2 addressMapping
+        return (show address3)
+
+lookup' :: Address -> Map Address a -> Either ErrorMessage a
+lookup' address mapping = 
+    case M.lookup address mapping of
+        Nothing -> Left (AddressLookupFailed address)
+        Just value -> Right value
+
 threeHops :: Address -> Maybe String
 threeHops address0 = 
     do
