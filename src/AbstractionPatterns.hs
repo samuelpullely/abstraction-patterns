@@ -1,8 +1,9 @@
 module AbstractionPatterns where
 
+import Control.Monad
 import Data.Map (Map)
 import qualified Data.Map as M
-import Prelude hiding (Monad(..), Applicative(..), Functor(..))
+-- import Prelude hiding (Monad(..), Applicative(..), Functor(..))
 
 newtype Address = MkAddress Int
     deriving (Eq, Ord, Show)
@@ -106,20 +107,20 @@ returnWithCounter x =
     MkWithCounter (\ currentCounter -> (x, currentCounter))
 
 
-class Applicative m => Monad m where
-    return :: a -> m a
-    (>>=) :: m a -> (a -> m b) -> m b
+-- class Applicative m => Monad m where
+--     return :: a -> m a
+--     (>>=) :: m a -> (a -> m b) -> m b
 
-instance Monad Maybe where
-    return = returnMaybe
-    (>>=) = bindMaybe
+-- instance Monad Maybe where
+--     return = returnMaybe
+--     (>>=) = bindMaybe
 
-instance Applicative Maybe where
-    pure = return
-    (<*>) = ap
+-- instance Applicative Maybe where
+--     pure = return
+--     (<*>) = ap
 
-instance Functor Maybe where
-    fmap = liftM
+-- instance Functor Maybe where
+--     fmap = liftM
 
 instance Monad WithCounter where
     return = returnWithCounter
@@ -132,43 +133,43 @@ instance Applicative WithCounter where
 instance Functor WithCounter where
     fmap = liftM
 
-liftM :: Monad m => (a -> b) -> m a -> m b
-liftM f computation = 
-    computation >>= \ a -> return (f a)
+-- liftM :: Monad m => (a -> b) -> m a -> m b
+-- liftM f computation = 
+--     computation >>= \ a -> return (f a)
 
-liftM2 :: Monad m => (a -> b -> c) -> m a -> m b -> m c
-liftM2 f computationa computationb = 
-    computationa >>= \ a ->
-    computationb >>= \ b -> 
-    return (f a b)
+-- liftM2 :: Monad m => (a -> b -> c) -> m a -> m b -> m c
+-- liftM2 f computationa computationb = 
+--     computationa >>= \ a ->
+--     computationb >>= \ b -> 
+--     return (f a b)
 
-liftM3 :: Monad m => (a -> b -> c -> d) -> m a -> m b -> m c -> m d
-liftM3 f computationa computationb computationc = 
-    computationa >>= \ a ->
-    computationb >>= \ b -> 
-    computationc >>= \ c -> 
-    return (f a b c)
+-- liftM3 :: Monad m => (a -> b -> c -> d) -> m a -> m b -> m c -> m d
+-- liftM3 f computationa computationb computationc = 
+--     computationa >>= \ a ->
+--     computationb >>= \ b -> 
+--     computationc >>= \ c -> 
+--     return (f a b c)
 
--- ($) :: (a -> b) -> a -> b
--- ($) f x = f x
+-- -- ($) :: (a -> b) -> a -> b
+-- -- ($) f x = f x
 
-ap :: Monad m => m (a -> b) -> m a -> m b
-ap computationf computationa =
-    computationf >>= \ f ->
-    computationa >>= \ a ->
-    return (f a)
+-- ap :: Monad m => m (a -> b) -> m a -> m b
+-- ap computationf computationa =
+--     computationf >>= \ f ->
+--     computationa >>= \ a ->
+--     return (f a)
 
-liftM2' :: Monad m => (a -> b -> c) -> m a -> m b -> m c
-liftM2' f computationa computationb = 
-    return f `ap` computationa `ap` computationb
+-- liftM2' :: Monad m => (a -> b -> c) -> m a -> m b -> m c
+-- liftM2' f computationa computationb = 
+--     return f `ap` computationa `ap` computationb
 
-liftM5' :: Monad m => (a1 -> a2 -> a3 -> a4 -> a5 -> b) -> m a1 -> m a2 -> m a3 -> m a4 -> m a5 -> m b
-liftM5' f c1 c2 c3 c4 c5 =
-    return f `ap` c1 `ap` c2 `ap` c3 `ap` c4 `ap` c5
+-- liftM5' :: Monad m => (a1 -> a2 -> a3 -> a4 -> a5 -> b) -> m a1 -> m a2 -> m a3 -> m a4 -> m a5 -> m b
+-- liftM5' f c1 c2 c3 c4 c5 =
+--     return f `ap` c1 `ap` c2 `ap` c3 `ap` c4 `ap` c5
 
-class Functor f => Applicative f where
-    pure :: a -> f a
-    (<*>) :: f (a -> b) -> f a -> f b
+-- class Functor f => Applicative f where
+--     pure :: a -> f a
+--     (<*>) :: f (a -> b) -> f a -> f b
 
-class Functor f where
-    fmap :: (a -> b) -> f a -> f b
+-- class Functor f where
+--     fmap :: (a -> b) -> f a -> f b
