@@ -117,3 +117,29 @@ instance Monad Maybe where
 instance Monad WithCounter where
     return = returnWithCounter
     (>>=) = bindWithCounter
+
+liftM :: Monad m => (a -> b) -> m a -> m b
+liftM f computation = 
+    computation >>= \ a -> return (f a)
+
+liftM2 :: Monad m => (a -> b -> c) -> m a -> m b -> m c
+liftM2 f computationa computationb = 
+    computationa >>= \ a ->
+    computationb >>= \ b -> 
+    return (f a b)
+
+liftM3 :: Monad m => (a -> b -> c -> d) -> m a -> m b -> m c -> m d
+liftM3 f computationa computationb computationc = 
+    computationa >>= \ a ->
+    computationb >>= \ b -> 
+    computationc >>= \ c -> 
+    return (f a b c)
+
+-- ($) :: (a -> b) -> a -> b
+-- ($) f x = f x
+
+ap :: Monad m => m (a -> b) -> m a -> m b
+ap computationf computationa =
+    computationf >>= \ f ->
+    computationa >>= \ a ->
+    return (f a)
