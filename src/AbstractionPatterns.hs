@@ -143,3 +143,11 @@ ap computationf computationa =
     computationf >>= \ f ->
     computationa >>= \ a ->
     return (f a)
+
+liftM2' :: Monad m => (a -> b -> c) -> m a -> m b -> m c
+liftM2' f computationa computationb = 
+    return f `ap` computationa `ap` computationb
+
+liftM5' :: Monad m => (a1 -> a2 -> a3 -> a4 -> a5 -> b) -> m a1 -> m a2 -> m a3 -> m a4 -> m a5 -> m b
+liftM5' f c1 c2 c3 c4 c5 =
+    return f `ap` c1 `ap` c2 `ap` c3 `ap` c4 `ap` c5
