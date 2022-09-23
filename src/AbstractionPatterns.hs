@@ -199,3 +199,25 @@ instance Functor WithCounter where
 
 -- class Functor f where
 --     fmap :: (a -> b) -> f a -> f b
+
+-- (>>=) :: [a] -> (a -> [b]) -> [b]
+-- return :: a -> [a]
+
+bindList :: [a] -> (a -> [b]) -> [b]
+bindList as f = concatMap f as
+
+returnList :: a -> [a]
+returnList a = [a] -- [], repeat a
+
+cartesianProduct' :: [a] -> [b] -> [(a, b)]
+cartesianProduct' as bs = [(a, b) | a <- as, b <- bs]
+    -- do 
+    --     a <- as
+    --     b <- bs
+    --     return (a, b)
+
+    -- as >>= \ a ->
+    -- bs >>= \ b ->
+    -- return (a, b)
+    
+    -- liftM2 (,) as bs
