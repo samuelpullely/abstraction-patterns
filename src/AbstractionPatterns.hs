@@ -1,6 +1,7 @@
 module AbstractionPatterns where
 
 import Control.Monad
+import Control.Monad.State hiding (get, put)
 import Data.Map (Map)
 import qualified Data.Map as M
 -- import Prelude hiding (Monad(..), Applicative(..), Functor(..))
@@ -89,7 +90,7 @@ labelTree tree = fst (runWithCounter (labelTree' tree) 1)
 
 newtype WithCounter a = MkWithCounter {runWithCounter :: Int -> (a, Int)}
 
-newtype State s a =  MkState {runState :: s -> (a, s)}
+-- newtype State s a =  MkState {runState :: s -> (a, s)}
 
 -- MkWithCounter :: (Int -> (a, Int)) -> WithCounter a
 -- runWithCounter :: WithCounter a -> (Int -> (a, Int))
@@ -124,10 +125,17 @@ tick :: WithCounter Int
 tick = MkWithCounter (\ current -> (current, current + 1))
 
 get :: State s s
-get = MkState (\ current -> (current, current))
+get = state (\ current -> (current, current))
 
 put :: s -> State s ()
-put s = MkState (\ _ -> ((), s))
+put s = state (\ _ -> ((), s))
+
+tick' :: State Int Int
+tick' = 
+    do
+        current <- get
+        put (current + 1)
+        return current
 
 bindWithCounter :: WithCounter a -> (a -> WithCounter b) -> WithCounter b
 bindWithCounter computation continuation =
