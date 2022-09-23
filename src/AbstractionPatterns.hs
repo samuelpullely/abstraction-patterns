@@ -89,6 +89,8 @@ labelTree tree = fst (runWithCounter (labelTree' tree) 1)
 
 newtype WithCounter a = MkWithCounter {runWithCounter :: Int -> (a, Int)}
 
+newtype State s a =  MkState {runState :: s -> (a, s)}
+
 -- MkWithCounter :: (Int -> (a, Int)) -> WithCounter a
 -- runWithCounter :: WithCounter a -> (Int -> (a, Int))
 
@@ -120,6 +122,12 @@ labelTree' (Node l x r) =
 
 tick :: WithCounter Int
 tick = MkWithCounter (\ current -> (current, current + 1))
+
+get :: State s s
+get = MkState (\ current -> (current, current))
+
+put :: s -> State s ()
+put s = MkState (\ _ -> ((), s))
 
 bindWithCounter :: WithCounter a -> (a -> WithCounter b) -> WithCounter b
 bindWithCounter computation continuation =
